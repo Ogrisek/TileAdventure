@@ -78,35 +78,35 @@ def game_frame_creator():
 def tile_updater():
     #get color for tile typ
 
-    tile_type_0_0 = "green"
-    tile_type_0_1 = "blue"
-    tile_type_0_2 = get_tile_type()
-    tile_type_0_3 = "blue"
-    tile_type_0_4 = "blue"
+    tile_type_0_0 = get_tile_type(0, 0)
+    tile_type_0_1 = get_tile_type(0, 1)
+    tile_type_0_2 = get_tile_type(0, 2)
+    tile_type_0_3 = get_tile_type(0, 3)
+    tile_type_0_4 = get_tile_type(0, 4)
 
-    tile_type_1_0 = "blue"
-    tile_type_1_1 = "blue"
-    tile_type_1_2 = "blue"
-    tile_type_1_3 = "blue"
-    tile_type_1_4 = "blue"
+    tile_type_1_0 = get_tile_type(1, 0)
+    tile_type_1_1 = get_tile_type(1, 1)
+    tile_type_1_2 = get_tile_type(1, 2)
+    tile_type_1_3 = get_tile_type(1, 3)
+    tile_type_1_4 = get_tile_type(1, 4)
 
-    tile_type_2_0 = "blue"
-    tile_type_2_1 = "blue"
-    tile_type_2_2 = "blue"
-    tile_type_2_3 = "blue"
-    tile_type_2_4 = "blue"
+    tile_type_2_0 = get_tile_type(2, 0)
+    tile_type_2_1 = get_tile_type(2, 1)
+    tile_type_2_2 = get_tile_type(2, 2)
+    tile_type_2_3 = get_tile_type(2, 3)
+    tile_type_2_4 = get_tile_type(2, 4)
 
-    tile_type_3_0 = "blue"
-    tile_type_3_1 = "blue"
-    tile_type_3_2 = "blue"
-    tile_type_3_3 = "blue"
-    tile_type_3_4 = "blue"
+    tile_type_3_0 = get_tile_type(3, 0)
+    tile_type_3_1 = get_tile_type(3, 1)
+    tile_type_3_2 = get_tile_type(3, 2)
+    tile_type_3_3 = get_tile_type(3, 3)
+    tile_type_3_4 = get_tile_type(3, 4)
 
-    tile_type_4_0 = "blue"
-    tile_type_4_1 = "blue"
-    tile_type_4_2 = "blue"
-    tile_type_4_3 = "blue"
-    tile_type_4_4 = "blue"
+    tile_type_4_0 = get_tile_type(4, 0)
+    tile_type_4_1 = get_tile_type(4, 1)
+    tile_type_4_2 = get_tile_type(4, 2)
+    tile_type_4_3 = get_tile_type(4, 3)
+    tile_type_4_4 = get_tile_type(4, 4)
 
     tile_0_0 = tk.Label(master=window, bg=tile_type_0_0)
     tile_0_1 = tk.Label(master=window, bg=tile_type_0_1)
@@ -168,8 +168,20 @@ def tile_updater():
     tile_4_3.grid(row=4, column=3, sticky="nesw")
     tile_4_4.grid(row=4, column=4, sticky="nesw")
 
-def get_tile_type():
-    color = "green"
+def get_tile_type(height_coordinate, width_coordinate):
+    color = "black"
+    if matrix[height_coordinate][width_coordinate] == 0:
+        color = "green"
+    if matrix[height_coordinate][width_coordinate] == 1:
+        color = "brown"
+    if matrix[height_coordinate][width_coordinate] == 2:
+        color = "blue"
+    if matrix[height_coordinate][width_coordinate] == 3:
+        color = "orange"
+    if matrix[height_coordinate][width_coordinate] == 4:
+        color = "yellow"
+    if matrix[height_coordinate][width_coordinate] == 5:
+        color = "red"
     return color
 
 def tile_type_creator():
