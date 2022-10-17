@@ -267,20 +267,26 @@ def check_game_beatable():
 
     #funktioniert nicht richtig
     grid = Grid(matrix=matrix_check)
-    start_height, start_width = search_tile_state(2)
-    end_height, end_width = search_tile_state(3)
-    print(search_tile_state(2))
-    print(search_tile_state(3))
-    start = grid.node(start_height, start_width)
-    end = grid.node(end_height, end_width)
     finder = AStarFinder()
-    path, runs = finder.find_path(start, end, grid)
+
+    start_height, start_width = search_tile_state(2)
+    chest_height, chest_width = search_tile_state(3)
+    key_height, key_width = search_tile_state(4)
+    boss_height, boss_width = search_tile_state(5)
+
+    print(search_tile_state(2))
+    print(search_tile_state(4))
+
+    start = grid.node(start_height, start_width)
+    key = grid.node(key_height, key_width)
+    chest = grid.node(chest_height, chest_width)
+    boss = grid.node(boss_height, boss_width)
+
+    path, runs = finder.find_path(start, key, grid)
     print(path)
     if path:
-        end_height, end_width = search_tile_state(4)
-        end = grid.node(end_height, end_width)
         print(search_tile_state(4))
-        path, runs = finder.find_path(start, end, grid)
+        path, runs = finder.find_path(key, chest, grid)
         print("true")
         print(path)
         if path:
@@ -288,9 +294,9 @@ def check_game_beatable():
             matrix_check[i][j] = 1
             grid = Grid(matrix=matrix_check)
             print(matrix_check, "f")
-            end_height, end_width = search_tile_state(5)
-            end = grid.node(end_height, end_width)
-            path, runs = finder.find_path(start, end, grid)
+            path, runs = finder.find_path(chest, boss, grid)
+            print("true2")
+            print(path)
             if path:
                 # game_beatable = 1
                 print("true3")
