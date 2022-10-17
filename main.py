@@ -285,11 +285,13 @@ def check_game_beatable():
     path, runs = finder.find_path(start, key, grid)
     print(path)
     if path:
+        Grid.cleanup(grid)
         print(search_tile_state(4))
         path, runs = finder.find_path(key, chest, grid)
         print("true")
         print(path)
         if path:
+            Grid.cleanup(grid)
             i, j = search_tile_state(5)
             matrix_check[i][j] = 1
             grid = Grid(matrix=matrix_check)
