@@ -1,5 +1,8 @@
 import random
 import tkinter as tk
+from pathfinding.core.grid import Grid
+from pathfinding.finder.a_star import AStarFinder
+import copy
 
 def main():
     start_fenster()
@@ -44,15 +47,17 @@ def start_button_creator():
 def handle_click_start(event):
     start_button.destroy()
     quit_button.destroy()
+    handle_click_play()
+
+def handle_click_play():
     # noinspection PyGlobalUndefined
     global game_beatable
-    #game_beatable = 0
-    # noinspection PyGlobalUndefined
-    #global game_beatable
+    print(game_beatable)
     while game_beatable == 0:
         tile_type_creator()
         check_game_beatable()
     game_frame_creator()
+
 
 def game_fenster():
     greeting = tk.Label(text="Daniel ist ein netter Mensch")
@@ -171,9 +176,9 @@ def tile_updater():
 def get_tile_type(height_coordinate, width_coordinate):
     color = "black"
     if matrix[height_coordinate][width_coordinate] == 0:
-        color = "green"
-    if matrix[height_coordinate][width_coordinate] == 1:
         color = "brown"
+    if matrix[height_coordinate][width_coordinate] == 1:
+        color = "green"
     if matrix[height_coordinate][width_coordinate] == 2:
         color = "blue"
     if matrix[height_coordinate][width_coordinate] == 3:
@@ -184,17 +189,16 @@ def get_tile_type(height_coordinate, width_coordinate):
         color = "red"
     return color
 
+
+# noinspection PyGlobalUndefined
 def tile_type_creator():
-    # noinspection PyGlobalUndefined
     global map_height
-    # noinspection PyGlobalUndefined
     global map_width
     map_height = 5
     map_width = 5
 
-    # noinspection PyGlobalUndefined
     global matrix
-    matrix = [[0 for x in range(map_height)] for y in range(map_width)]
+    matrix = [[1 for x in range(map_height)] for y in range(map_width)]
 
     height_coordinates, width_coordinates = rng(map_height, map_width)
     height_coordinates = height_coordinates - 1
@@ -211,66 +215,114 @@ def tile_type_creator():
         #print(height_coordinates)
         #print(width_coordinates)
 
-        while matrix[height_coordinates][width_coordinates] != 0:
+        while matrix[height_coordinates][width_coordinates] != 1:
             amount_tree = amount_tree + 1
             height_coordinates, width_coordinates = rng(map_height, map_width)
             height_coordinates = height_coordinates - 1
             width_coordinates = width_coordinates - 1
 
-        matrix[height_coordinates][width_coordinates] = 1
+        matrix[height_coordinates][width_coordinates] = 0
 
     height_coordinates, width_coordinates = rng(map_height, map_width)
     height_coordinates = height_coordinates - 1
     width_coordinates = width_coordinates - 1
-    while matrix[height_coordinates][width_coordinates] != 0:
+    while matrix[height_coordinates][width_coordinates] != 1:
         amount_tree = amount_tree + 1
         height_coordinates, width_coordinates = rng(map_height, map_width)
         height_coordinates = height_coordinates - 1
         width_coordinates = width_coordinates - 1
     matrix[height_coordinates][width_coordinates] = 3
 
-    while matrix[height_coordinates][width_coordinates] != 0:
+    while matrix[height_coordinates][width_coordinates] != 1:
         amount_tree = amount_tree + 1
         height_coordinates, width_coordinates = rng(map_height, map_width)
         height_coordinates = height_coordinates - 1
         width_coordinates = width_coordinates - 1
     matrix[height_coordinates][width_coordinates] = 4
 
-    while matrix[height_coordinates][width_coordinates] != 0:
+    while matrix[height_coordinates][width_coordinates] != 1:
         amount_tree = amount_tree + 1
         height_coordinates, width_coordinates = rng(map_height, map_width)
         height_coordinates = height_coordinates - 1
         width_coordinates = width_coordinates - 1
     matrix[height_coordinates][width_coordinates] = 5
 
-    for x in range(5):
-        print(matrix[x][0], matrix[x][1], matrix[x][2], matrix[x][3], matrix[x][4])
-    #matrix[0][0] = 3
-    #print(matrix[0][0])
-    #print(matrix[0][1])
-
+# noinspection PyGlobalUndefined
 def check_game_beatable():
-    #trial and error path finder
-    print(matrix[0][0])
-    # noinspection PyGlobalUndefined
     global game_beatable
-    game_beatable = 1
-    # noinspection PyGlobalUndefined
-    global player_height
-    # noinspection PyGlobalUndefined
-    global player_width
-
+    #game_beatable = 1
+    print(matrix)
+    matrix_check = copy.deepcopy(matrix)
     for x in range(map_height):
         for y in range(map_width):
-            if matrix[x][y] == 2:
-                player_height = x
-                player_width = y
+            if matrix_check[x][y] == 2:
+                matrix_check[x][y] = 1
+            if matrix_check[x][y] == 3:
+                matrix_check[x][y] = 1
+            if matrix_check[x][y] == 4:
+                matrix_check[x][y] = 1
+            if matrix_check[x][y] == 5:
+                matrix_check[x][y] = 0
+    print(matrix_check)
 
-    print(player_height, player_width)
+    #funktioniert nicht richtig
+    grid = Grid(matrix=matrix_check)
+    start_height, start_width = search_tile_state(2)
+    end_height, end_width = search_tile_state(3)
+    print(search_tile_state(2))
+    print(search_tile_state(3))
+    start = grid.node(start_height, start_width)
+    end = grid.node(end_height, end_width)
+    finder = AStarFinder()
+    path, runs = finder.find_path(start, end, grid)
+    print(path)
+    if path:
+        end_height, end_width = search_tile_state(4)
+        end = grid.node(end_height, end_width)
+        print(search_tile_state(4))
+        path, runs = finder.find_path(start, end, grid)
+        print("true")
+        print(path)
+        if path:
+            i, j = search_tile_state(5)
+            matrix_check[i][j] = 1
+            grid = Grid(matrix=matrix_check)
+            print(matrix_check, "f")
+            end_height, end_width = search_tile_state(5)
+            end = grid.node(end_height, end_width)
+            path, runs = finder.find_path(start, end, grid)
+            if path:
+                # game_beatable = 1
+                print("true3")
+            else:
+                print("false3")
+        else:
+            print("false2")
+    else:
+        print("false")
+    game_beatable = 1
+    Grid.cleanup(grid)
+    #print(player_height, player_width)
 
     #for player_height in range(map_height):
     #    for player_width in range(map_width):
 
+
+# noinspection PyGlobalUndefined
+def search_tile_state(tile_value):
+    tile_height = 0
+    tile_width = 0
+    for x in range(map_height):
+        for y in range(map_width):
+            if matrix[x][y] == tile_value:
+                tile_height = x
+                tile_width = y
+    #print(tile_height, "t", tile_value)
+    return tile_height, tile_width
+
+def check_tile_state(tile_height_coordinate, tile_width_coordinate):
+    tile_state = matrix[tile_height_coordinate][tile_width_coordinate]
+    return tile_state
 
 window = tk.Tk()
 
