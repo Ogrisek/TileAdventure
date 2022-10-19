@@ -40,14 +40,59 @@ def start_button_creator():
     start_button = tk.Button(text="Click me!", background="turquoise")
     start_button.bind("<Button-1>", handle_click_start)
     start_button.pack()
-    global game_beatable
-    game_beatable = 0
     global tile_type_save
+    global check_entry
     tile_type_save = 1
+    check_entry = 0
 
+    global height_entry
+    global height_label
+    global width_entry
+    global width_label
+    height_label = tk.Label(text="Enter height", bg="green")
+    height_entry = tk.Entry()
+    width_label = tk.Label(text="Enter height", bg="green")
+    width_entry = tk.Entry()
+    height_label.pack()
+    height_entry.pack()
+    width_label.pack()
+    width_entry.pack()
+
+    global inventory_key
+    global inventory_sword
+    global game_won
+    inventory_key = 0
+    inventory_sword = 0
+    game_won = 0
+
+# noinspection PyGlobalUndefined
 def handle_click_start(event):
+    global map_height
+    global map_width
+
+    #map_height = int(map_height_entry)
+    #map_width = int(map_width_entry)
     start_button.destroy()
     quit_button.destroy()
+    global check_entry
+    if check_entry == 0:
+        if not height_entry.get() or int(height_entry.get()) < 5:
+            map_height = 5
+        else:
+            map_height = int(height_entry.get())
+        if not width_entry.get() or int(width_entry.get()) < 5:
+            map_width = 5
+        else:
+            map_width = int(width_entry.get())
+        height_entry.destroy()
+        height_label.destroy()
+        width_entry.destroy()
+        width_label.destroy()
+        check_entry = 1
+    hide_label_sword = tk.Label(background="#F0F0F0")
+    hide_label_key = tk.Label(bg="#F0F0F0")
+    hide_label_key.grid(row=5, column=3, sticky="nesw")
+    hide_label_sword.grid(row=6, column=3, sticky="nesw")
     play()
 
 # noinspection PyGlobalUndefined
@@ -84,7 +129,7 @@ def game_frame_creator():
     button_down = tk.Button(master=window, bg="beige", text="↓")
     button_left = tk.Button(master=window, bg="beige", text="←")
     button_right = tk.Button(master=window, bg="beige", text="→")
-    button_interact = tk.Button(master=window, bg="beige", text="use")
+    button_interact = tk.Button(master=window, bg="beige", text="Use")
     button_quit = tk.Button(master=window, bg="beige", text="Quit")
     button_restart = tk.Button(master=window, bg="beige", text="Restart")
 
@@ -92,7 +137,7 @@ def game_frame_creator():
     button_down.bind("<Button-1>", handle_click_down)
     button_left.bind("<Button-1>", handle_click_left)
     button_right.bind("<Button-1>", handle_click_right)
-    #button_interact.bind("<Button-1>", handle_click_interact)
+    button_interact.bind("<Button-1>", handle_click_interact)
     button_quit.bind("<Button-1>", handle_click_quit)
     button_restart.bind("<Button-1>", handle_click_start)
 
@@ -189,42 +234,147 @@ def handle_click_right(event):
                 matrix[player_height_coordinate][player_width_coordinate + 1] = 2
                 matrix[player_height_coordinate][player_width_coordinate] = tile_type_save
                 tile_type_save = tile_type_save_new
+    tile_updater()
 
+# noinspection PyGlobalUndefined
+def handle_click_interact(event):
+    x, y = search_tile_state(2)
+    global matrix
+    global tile_type_save
+    global inventory_key
+    global inventory_sword
+    global game_won
+    global sword_label
+    global key_label
+
+    if not x + 1 >= map_height:
+        if matrix[x+1][y] == 5:
+            if inventory_sword == 1:
+                boss_coord_x, boss_coord_y = search_tile_state(5)
+                matrix[boss_coord_x][boss_coord_y] = 1
+                game_won = 1
+    if not x - 1 < 0:
+        if matrix[x-1][y] == 5:
+            if inventory_sword == 1:
+                boss_coord_x, boss_coord_y = search_tile_state(5)
+                matrix[boss_coord_x][boss_coord_y] = 1
+                game_won = 1
+    if not y + 1 >= map_width:
+        if matrix[x][y+1] == 5:
+            if inventory_sword == 1:
+                boss_coord_x, boss_coord_y = search_tile_state(5)
+                matrix[boss_coord_x][boss_coord_y] = 1
+                game_won = 1
+    if not y - 1 < 0:
+        if matrix[x][y-1] == 5:
+            if inventory_sword == 1:
+                boss_coord_x, boss_coord_y = search_tile_state(5)
+                matrix[boss_coord_x][boss_coord_y] = 1
+                game_won = 1
+
+    if not x + 1 >= map_height:
+        if matrix[x+1][y] == 3:
+            if inventory_key == 1:
+                inventory_sword = 1
+                chest_coord_x, chest_coord_y = search_tile_state(3)
+                matrix[chest_coord_x][chest_coord_y] = 1
+    if not x - 1 < 0:
+        if matrix[x-1][y] == 3:
+            if inventory_key == 1:
+                inventory_sword = 1
+                chest_coord_x, chest_coord_y = search_tile_state(3)
+                matrix[chest_coord_x][chest_coord_y] = 1
+    if not y + 1 >= map_width:
+        if matrix[x][y+1] == 3:
+            if inventory_key == 1:
+                inventory_sword = 1
+                chest_coord_x, chest_coord_y = search_tile_state(3)
+                matrix[chest_coord_x][chest_coord_y] = 1
+    if not y - 1 < 0:
+        if matrix[x][y-1] == 3:
+            if inventory_key == 1:
+                inventory_sword = 1
+                chest_coord_x, chest_coord_y = search_tile_state(3)
+                matrix[chest_coord_x][chest_coord_y] = 1
+    if tile_type_save == 3:
+        if inventory_key == 1:
+            inventory_sword = 1
+            tile_type_save = 1
+
+    if not x + 1 >= map_height:
+        if matrix[x+1][y] == 4:
+            inventory_key = 1
+            key_coord_x, key_coord_y = search_tile_state(4)
+            matrix[key_coord_x][key_coord_y] = 1
+    if not x - 1 < 0:
+        if matrix[x-1][y] == 4:
+            inventory_key = 1
+            key_coord_x, key_coord_y = search_tile_state(4)
+            matrix[key_coord_x][key_coord_y] = 1
+    if not y + 1 >= map_width:
+        if matrix[x][y+1] == 4:
+            inventory_key = 1
+            key_coord_x, key_coord_y = search_tile_state(4)
+            matrix[key_coord_x][key_coord_y] = 1
+    if not y - 1 < 0:
+        if matrix[x][y-1] == 4:
+            inventory_key = 1
+            key_coord_x, key_coord_y = search_tile_state(4)
+            matrix[key_coord_x][key_coord_y] = 1
+    if tile_type_save == 4:
+        inventory_key = 1
+        tile_type_save = 1
+
+    key_label = tk.Label(text="Key", bg="Yellow")
+    sword_label = tk.Label(text="Sword", bg="Orange")
+
+    if inventory_key == 1:
+        #key_label = tk.Label(text="Key", bg="Yellow")
+        key_label.grid(row=5, column=3, sticky="nesw")
+    if inventory_sword == 1:
+        #sword_label = tk.Label(text="Sword", bg="Orange")
+        sword_label.grid(row=6, column=3, sticky="nesw")
+    if game_won == 1:
+        print("Won")
+        inventory_sword = 0
+        inventory_key = 0
+        game_won = 0
     tile_updater()
 
 def game_fenster_update():
     print("yes")
 
 def tile_updater():
-    tile_type_0_0 = get_tile_type(0, 0)
-    tile_type_0_1 = get_tile_type(0, 1)
-    tile_type_0_2 = get_tile_type(0, 2)
-    tile_type_0_3 = get_tile_type(0, 3)
-    tile_type_0_4 = get_tile_type(0, 4)
+    player_height, player_width = search_tile_state(2)
+    tile_type_0_0 = get_tile_type(player_height - 2, player_width - 2)
+    tile_type_0_1 = get_tile_type(player_height - 2, player_width - 1)
+    tile_type_0_2 = get_tile_type(player_height - 2, player_width)
+    tile_type_0_3 = get_tile_type(player_height - 2, player_width + 1)
+    tile_type_0_4 = get_tile_type(player_height - 2, player_width + 2)
 
-    tile_type_1_0 = get_tile_type(1, 0)
-    tile_type_1_1 = get_tile_type(1, 1)
-    tile_type_1_2 = get_tile_type(1, 2)
-    tile_type_1_3 = get_tile_type(1, 3)
-    tile_type_1_4 = get_tile_type(1, 4)
+    tile_type_1_0 = get_tile_type(player_height - 1, player_width - 2)
+    tile_type_1_1 = get_tile_type(player_height - 1, player_width - 1)
+    tile_type_1_2 = get_tile_type(player_height - 1, player_width)
+    tile_type_1_3 = get_tile_type(player_height - 1, player_width + 1)
+    tile_type_1_4 = get_tile_type(player_height - 1, player_width + 2)
 
-    tile_type_2_0 = get_tile_type(2, 0)
-    tile_type_2_1 = get_tile_type(2, 1)
-    tile_type_2_2 = get_tile_type(2, 2)
-    tile_type_2_3 = get_tile_type(2, 3)
-    tile_type_2_4 = get_tile_type(2, 4)
+    tile_type_2_0 = get_tile_type(player_height, player_width - 2)
+    tile_type_2_1 = get_tile_type(player_height, player_width - 1)
+    tile_type_2_2 = get_tile_type(player_height, player_width)
+    tile_type_2_3 = get_tile_type(player_height, player_width + 1)
+    tile_type_2_4 = get_tile_type(player_height, player_width + 2)
 
-    tile_type_3_0 = get_tile_type(3, 0)
-    tile_type_3_1 = get_tile_type(3, 1)
-    tile_type_3_2 = get_tile_type(3, 2)
-    tile_type_3_3 = get_tile_type(3, 3)
-    tile_type_3_4 = get_tile_type(3, 4)
+    tile_type_3_0 = get_tile_type(player_height + 1, player_width - 2)
+    tile_type_3_1 = get_tile_type(player_height + 1, player_width - 1)
+    tile_type_3_2 = get_tile_type(player_height + 1, player_width)
+    tile_type_3_3 = get_tile_type(player_height + 1, player_width + 1)
+    tile_type_3_4 = get_tile_type(player_height + 1, player_width + 2)
 
-    tile_type_4_0 = get_tile_type(4, 0)
-    tile_type_4_1 = get_tile_type(4, 1)
-    tile_type_4_2 = get_tile_type(4, 2)
-    tile_type_4_3 = get_tile_type(4, 3)
-    tile_type_4_4 = get_tile_type(4, 4)
+    tile_type_4_0 = get_tile_type(player_height + 2, player_width - 2)
+    tile_type_4_1 = get_tile_type(player_height + 2, player_width - 1)
+    tile_type_4_2 = get_tile_type(player_height + 2, player_width)
+    tile_type_4_3 = get_tile_type(player_height + 2, player_width + 1)
+    tile_type_4_4 = get_tile_type(player_height + 2, player_width + 2)
 
     tile_0_0 = tk.Label(master=window, bg=tile_type_0_0)
     tile_0_1 = tk.Label(master=window, bg=tile_type_0_1)
@@ -286,32 +436,31 @@ def tile_updater():
     tile_4_3.grid(row=4, column=3, sticky="nesw")
     tile_4_4.grid(row=4, column=4, sticky="nesw")
 
-def get_tile_type(height_coordinate, width_coordinate):
-    color = "black"
-    if matrix[height_coordinate][width_coordinate] == 0:
-        color = "brown"
-    if matrix[height_coordinate][width_coordinate] == 1:
-        color = "green"
-    if matrix[height_coordinate][width_coordinate] == 2:
-        color = "blue"
-    if matrix[height_coordinate][width_coordinate] == 3:
-        color = "orange"
-    if matrix[height_coordinate][width_coordinate] == 4:
-        color = "yellow"
-    if matrix[height_coordinate][width_coordinate] == 5:
-        color = "red"
+def get_tile_type(height_coord, width_coord):
+    color = "grey"
+    if height_coord >= map_height or height_coord < 0 or width_coord < 0 or width_coord >= map_width:
+        color = "black"
+    else:
+        if matrix[height_coord][width_coord] == 0:
+            color = "brown"
+        if matrix[height_coord][width_coord] == 1:
+            color = "green"
+        if matrix[height_coord][width_coord] == 2:
+            color = "blue"
+        if matrix[height_coord][width_coord] == 3:
+            color = "orange"
+        if matrix[height_coord][width_coord] == 4:
+            color = "yellow"
+        if matrix[height_coord][width_coord] == 5:
+            color = "red"
     return color
-
 
 # noinspection PyGlobalUndefined
 def tile_type_creator():
     global map_height
     global map_width
-    map_height = 5
-    map_width = 5
-
     global matrix
-    matrix = [[1 for x in range(map_height)] for y in range(map_width)]
+    matrix = [[1 for x in range(map_width)] for y in range(map_height)]
 
     height_coordinates, width_coordinates = rng(map_height, map_width)
     height_coordinates = height_coordinates - 1
