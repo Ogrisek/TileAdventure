@@ -27,7 +27,7 @@ def handle_keypress(event):
 def quit_button_creator():
     # noinspection PyGlobalUndefined
     global quit_button
-    quit_button = tk.Button(text="Quit", background="red")
+    quit_button = tk.Button(text="Quit", background="black", fg="red")
     quit_button.bind("<Button-1>", handle_click_quit)
     quit_button.pack()
 
@@ -37,7 +37,7 @@ def handle_click_quit(event):
 # noinspection PyGlobalUndefined
 def start_button_creator():
     global start_button
-    start_button = tk.Button(text="Click me!", background="turquoise")
+    start_button = tk.Button(text="Play", background="turquoise")
     start_button.bind("<Button-1>", handle_click_start)
     start_button.pack()
     global tile_type_save
@@ -65,6 +65,23 @@ def start_button_creator():
     inventory_sword = 0
     game_won = 0
 
+    global info_key
+    global info_chest
+    global info_player
+    global info_boss
+    global info_tree
+
+    info_player = tk.Label(text="Player", bg="blue", fg="black")
+    info_tree = tk.Label(text="Tree", bg="brown", fg="black")
+    info_key = tk.Label(text="Key", bg="Yellow", fg="black")
+    info_chest = tk.Label(text="Chest", bg="orange", fg="black")
+    info_boss = tk.Label(text="Boss", bg="red", fg="black")
+    info_player.pack()
+    info_boss.pack()
+    info_tree.pack()
+    info_key.pack()
+    info_chest.pack()
+
 # noinspection PyGlobalUndefined
 def handle_click_start(event):
     global map_height
@@ -74,6 +91,11 @@ def handle_click_start(event):
     #map_width = int(map_width_entry)
     start_button.destroy()
     quit_button.destroy()
+    info_player.destroy()
+    info_tree.destroy()
+    info_key.destroy()
+    info_chest.destroy()
+    info_boss.destroy()
     global check_entry
     if check_entry == 0:
         if not height_entry.get() or int(height_entry.get()) < 5:
